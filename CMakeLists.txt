@@ -12,6 +12,7 @@ SET(INCLUDE_DIRS
 SET(SRC_FILES
 	src/common/BaseService.cc
 	src/common/runner.cc
+	src/rtsp/RtspMain.cc
 	src/main.cc
 	)
 

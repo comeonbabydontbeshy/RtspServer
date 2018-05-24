@@ -5,11 +5,11 @@
 using rtsp::common::BaseProcess;
 using rtsp::common::RunningStatus;
 
-void BaseProcess::registeRunnerMap(const std::string& runnerName, runnerPtr runnerObj) {
+void BaseProcess::registeRunnerMap(runnerPtr runnerObj) {
 	wLock lck(mtx_);
-	auto iter = runnerMap_.find(runnerName);
+	auto iter = runnerMap_.find(runnerObj->getRunnerName());
 	if (iter == runnerMap_.end()) {
-		runnerMap_.emplace(runnerName, runnerObj);
+		runnerMap_.emplace(runnerObj->getRunnerName(), runnerObj);
 	}
 }
 
@@ -30,7 +30,7 @@ void BaseProcess::start() {
 	{
 		wLock lck(mtx_);
 		for (auto& item : runnerMap_) {
-			item.second->run();
+			item.second->start();
 		}
 	}
 	waitAll();
@@ -42,6 +42,7 @@ void BaseProcess::stop() {
 		wLock lck(mtx_);
 		for (auto& item : runnerMap_) {
 			item.second->stop();
+			std::cout << item.first << " exit" << std::endl;
 		}
 	}
 }
@@ -61,7 +62,6 @@ void BaseProcess::signalHandle() {
 		struct timespec timeout = { 1, 0 };
 		err = sigtimedwait(&set, &sigInfo, &timeout);
 		if (-1 == err) {
-			std::cout << "call sigwait error : " << errno << std::endl;
 			continue;
 		}
 		std::cout << "catch signal : " << sigInfo.si_signo << std::endl;
@@ -97,7 +97,7 @@ void rtsp::common::BaseProcess::waitAll() {
 		{
 			rLock lck(mtx_);
 			for (auto& item : runnerMap_) {
-				if (RunningStatus::running == item.second->getRunningStatus()) {
+				if (item.second->isRunning()) {
 					isAllStoped = false;
 					break;
 				}
@@ -107,6 +107,10 @@ void rtsp::common::BaseProcess::waitAll() {
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+	wLock lck(mtx_);
+	for (auto& item : runnerMap_) {
+		item.second->wait();
 	}
 }
 

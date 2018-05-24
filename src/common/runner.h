@@ -21,15 +21,23 @@ class Runner {
 
 	 RunningStatus getRunningStatus();
 
+	 bool isRunning();
+
+	 void wait();
+
+	 const std::string& getRunnerName();
+
 	 virtual void run();
 
 	 virtual void stop();
 
 	 virtual ~Runner();
+
+ protected:
+	 RunningStatus runStatus_;
+
  private:
 	 std::string runnerName_;
-
-	 RunningStatus runStatus_;
 
 	 std::thread thread_;
 };

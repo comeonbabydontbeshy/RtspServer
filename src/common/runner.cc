@@ -21,13 +21,28 @@ rtsp::common::RunningStatus rtsp::common::Runner::getRunningStatus() {
 	return runStatus_;
 }
 
+bool rtsp::common::Runner::isRunning() {
+	if (RunningStatus::running == runStatus_) {
+		return true;
+	}
+	return false;
+}
+
+void rtsp::common::Runner::wait() {
+	if (thread_.joinable()) {
+		thread_.join();
+	}
+}
+
+const std::string& rtsp::common::Runner::getRunnerName() {
+	return runnerName_;
+}
+
 void rtsp::common::Runner::stop() {
 	runStatus_ = RunningStatus::stop;
 }
 
 rtsp::common::Runner::~Runner() {
-	if (thread_.joinable()) {
-		thread_.join();
-	}
+	
 }
 

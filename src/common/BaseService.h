@@ -22,7 +22,7 @@ class BaseProcess{
 
 	 using runnerPtr = std::shared_ptr<Runner>;
 
-	 void registeRunnerMap(const std::string& runnerName, runnerPtr runnerObj);
+	 void registeRunnerMap(runnerPtr runnerObj);
 
 	 void unRegisteRunnerMap(const std::string& runnerName);
 
